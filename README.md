@@ -29,5 +29,11 @@ Broadcasting Plugin For Velocity
             <td>Any <a href="https://docs.adventure.kyori.net/minimessage.html#the-components">Valid MiniMessage String</a></td>
             <td><code>osmc.broadcast.send.minimessage</code></td>
         </tr>
+        <tr>
+            <td><code>/broadcast</code></td>
+            <td><code>text</code></td>
+            <td>Any Text</td>
+            <td><code>osmc.broadcast.send.text</code></td>
+        </tr>
     </tbody>
 </table>

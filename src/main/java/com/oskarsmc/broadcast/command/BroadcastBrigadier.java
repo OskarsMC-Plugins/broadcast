@@ -40,8 +40,11 @@ public class BroadcastBrigadier {
                             return 0;
                         }
                     } else if (context.getSource().hasPermission("osmc.broadcast.send.minimessage") && context.getArgument("type", String.class).equals("minimessage")) {
-                            component = MiniMessage.get().parse(context.getArgument("content", String.class));
-                    } else {
+                        component = MiniMessage.get().parse(context.getArgument("content", String.class));
+                    } else if (context.getSource().hasPermission("osmc.broadcast.send.text") && context.getArgument("type", String.class).equals("text")) {
+                        component = MiniMessage.get().parse("<pre>" + context.getArgument("context", String.class) + "</pre>");
+                    }
+                    else {
                         return 0;
                     }
 
