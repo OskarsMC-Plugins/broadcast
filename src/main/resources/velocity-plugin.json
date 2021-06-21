@@ -1,0 +1,13 @@
+{
+  "id": "broadcast",
+  "name": "broadcast",
+  "version": "${project.version}",
+  "description": "Broadcasting Plugin For Velocity",
+  "url": "https://software.oskarsmc.com/",
+  "authors": [
+    "OskarZyg",
+    "OskarsMC"
+  ],
+  "dependencies": [],
+  "main": "com.oskarsmc.broadcast.Broadcast"
+}
