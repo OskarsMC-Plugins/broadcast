@@ -9,6 +9,7 @@ import com.oskarsmc.broadcast.Broadcast;
 import com.oskarsmc.broadcast.util.JSONUtils;
 import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bstats.charts.SingleLineChart;
@@ -34,7 +35,7 @@ public class BroadcastCommand {
 
         CommandArgument.Builder<CommandSource, String> minimessageBuilder = StringArgument.<CommandSource>newBuilder("minimessage")
                 .greedy()
-                .withParser((context, inputQueue) -> {
+/*                .withParser((context, inputQueue) -> {
                     String input = inputQueue.peek();
 
                     if (input == null) {
@@ -47,11 +48,11 @@ public class BroadcastCommand {
                     } catch (Exception e) {
                         return ArgumentParseResult.failure(e);
                     }
-                });
+                })*/;
 
         plugin.commandManager.command(builder.literal("minimessage", ArgumentDescription.of("Broadcast a minimessage string."))
                 .permission("osmc.broadcast.minimessage")
-                .argument(minimessageBuilder, ArgumentDescription.of("MiniMessage String"))
+                .argument(minimessageBuilder.build(), ArgumentDescription.of("MiniMessage String"))
                 .handler(context -> {
                     broadcastComponent(MiniMessage.get().parse(context.get("minimessage")), BroadcastType.MINIMESSAGE);
                 })
@@ -59,7 +60,7 @@ public class BroadcastCommand {
 
         CommandArgument.Builder<CommandSource, String> rawBuilder = StringArgument.<CommandSource>newBuilder("json")
                 .greedy()
-                .withParser((context, inputQueue) -> {
+/*                .withParser((commandContext, inputQueue) -> {
                     String input = inputQueue.peek();
                     System.out.println("hello?");
                     System.out.println(inputQueue);
@@ -75,13 +76,17 @@ public class BroadcastCommand {
                     } catch (Exception e) {
                         return ArgumentParseResult.failure(e);
                     }
-                });
+                })*/;
 
         plugin.commandManager.command(builder.literal("raw", ArgumentDescription.of("Broadcast raw JSON"))
-                .argument(rawBuilder, ArgumentDescription.of("The JSON to broadcast."))
+                .argument(rawBuilder.build(), ArgumentDescription.of("The JSON to broadcast."))
                 .permission("osmc.broadcast.raw")
                 .handler(context -> {
-                    broadcastComponent(GsonComponentSerializer.gson().deserialize(context.get("json")), BroadcastType.RAW);
+                    try {
+                        broadcastComponent(GsonComponentSerializer.gson().deserialize(context.get("json")), BroadcastType.RAW);
+                    } catch (Exception e) { //TODO: Don't use this workaround!
+                        context.getSender().sendMessage(Component.text("Error while sending your broadcast (likely a JSON formatting issue!): " + e.getMessage(), NamedTextColor.RED));
+                    }
                 })
         );
 
