@@ -11,20 +11,15 @@ import com.velocitypowered.api.command.CommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.SingleLineChart;
 import org.bstats.velocity.Metrics;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class BroadcastCommand {
     private Broadcast plugin;
     private AtomicInteger broadcasts = new AtomicInteger(0);
-    private ConcurrentHashMap<String, Integer> broadcastTypes = new ConcurrentHashMap<String, Integer>();
 
     enum BroadcastType {
         RAW,
@@ -38,6 +33,7 @@ public class BroadcastCommand {
         Command.Builder<CommandSource> builder = plugin.commandManager.commandBuilder("broadcast");
 
         CommandArgument.Builder<CommandSource, String> minimessageBuilder = StringArgument.<CommandSource>newBuilder("minimessage")
+                .greedy()
                 .withParser((context, inputQueue) -> {
                     String input = inputQueue.peek();
 
@@ -62,18 +58,23 @@ public class BroadcastCommand {
         );
 
         CommandArgument.Builder<CommandSource, String> rawBuilder = StringArgument.<CommandSource>newBuilder("json")
+                .greedy()
                 .withParser((context, inputQueue) -> {
                     String input = inputQueue.peek();
+                    System.out.println("hello?");
+                    System.out.println(inputQueue);
+                    System.out.println(input);
 
                     if (input == null) {
                         return ArgumentParseResult.failure(new IllegalArgumentException("The JSON you provided was null."));
                     }
 
-                    if (JSONUtils.isJSONValid(input)) {
+                    try {
+                        GsonComponentSerializer.gson().deserialize(input);
                         return ArgumentParseResult.success(input);
+                    } catch (Exception e) {
+                        return ArgumentParseResult.failure(e);
                     }
-
-                    return ArgumentParseResult.failure(new IllegalArgumentException("The JSON you provided was not valid."));
                 });
 
         plugin.commandManager.command(builder.literal("raw", ArgumentDescription.of("Broadcast raw JSON"))
@@ -91,29 +92,23 @@ public class BroadcastCommand {
                     broadcastComponent(Component.text((String) context.get("text")), BroadcastType.TEXT);
                 })
         );
+
+        metrics(plugin.metrics);
     }
 
-    public void broadcastComponent(Component component, BroadcastType type) {
+    public void broadcastComponent(Component component, BroadcastType type) { // Broadcast type can be useful for future!
         plugin.proxyServer.sendMessage(component);
+
+        broadcasts.incrementAndGet();
     }
 
     private void metrics(Metrics metrics) {
-
         metrics.addCustomChart(new SingleLineChart("broadcasts", new Callable<Integer>() {
             @Override
             public Integer call() {
                 int broadcasts = BroadcastCommand.this.broadcasts.get();
                 BroadcastCommand.this.broadcasts.set(0);
                 return broadcasts;
-            }
-        }));
-
-        metrics.addCustomChart(new AdvancedPie("broadcast_type", new Callable<Map<String, Integer>>() {
-            @Override
-            public Map<String, Integer> call() {
-                Map<String, Integer> map = BroadcastCommand.this.broadcastTypes;
-                BroadcastCommand.this.broadcastTypes.clear();
-                return map;
             }
         }));
     }
