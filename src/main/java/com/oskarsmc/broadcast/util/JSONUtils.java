@@ -1,6 +1,5 @@
 package com.oskarsmc.broadcast.util;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,11 +8,7 @@ public class JSONUtils {
         try {
             new JSONObject(test);
         } catch (JSONException ex) {
-            try {
-                new JSONArray(test);
-            } catch (JSONException ex1) {
-                return false;
-            }
+            return false;
         }
         return true;
     }
