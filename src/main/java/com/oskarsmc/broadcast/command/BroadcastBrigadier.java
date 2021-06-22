@@ -1,6 +1,5 @@
 package com.oskarsmc.broadcast.command;
 
-import com.google.gson.stream.MalformedJsonException;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
@@ -21,6 +20,7 @@ public class BroadcastBrigadier {
     public Component invalidMessage = Component.text("Invalid input.", NamedTextColor.RED, TextDecoration.BOLD);
 
     public BroadcastBrigadier(ProxyServer proxyServer) {
+
         LiteralCommandNode<CommandSource> sendCommand = LiteralArgumentBuilder
                 .<CommandSource>literal("broadcast")
                 .executes(context -> {
